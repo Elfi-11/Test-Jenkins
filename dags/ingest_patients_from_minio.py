@@ -128,6 +128,12 @@ def s3_client():
 def ingest_patients_from_minio():
 
     @task
+    def hello_world() -> str:
+        message = "Hello world depuis Airflow, déclenché par Jenkins."
+        print(message)
+        return message
+
+    @task
     def list_csv_files() -> list[str]:
         s3 = s3_client()
         response = s3.list_objects_v2(Bucket=BUCKET)
@@ -173,9 +179,7 @@ def ingest_patients_from_minio():
             clean_rows.append((nom, prenom, age, pathologie, service, key))
 
         inserted = 0
-        print("Hello World!")
 
-        try:
         with pg_conn() as conn:
             with conn.cursor() as cur:
                 for nom, prenom, age, pathologie, service, source_file in clean_rows:
@@ -194,7 +198,9 @@ def ingest_patients_from_minio():
 
         return {"file": key, "inserted": inserted, "rejected": rejected}
 
+    hello = hello_world()
     keys = list_csv_files()
+    hello >> keys
     ingest_one_file.expand(key=keys)
 
 

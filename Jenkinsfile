@@ -6,6 +6,7 @@ pipeline {
         stage('Check project files') {
             steps {
                 sh '''
+                set -eu
                 echo "Vérification de la structure du projet"
 
                 test -f docker-compose.yml
@@ -21,9 +22,10 @@ pipeline {
         stage('Check DAG syntax') {
             steps {
                 sh '''
+                set -eu
                 echo "Vérification simple du DAG Airflow"
 
-                grep -q "dag_id=\"ingest_patients_from_minio\"" dags/ingest_patients_from_minio.py
+                grep -q 'dag_id="ingest_patients_from_minio"' dags/ingest_patients_from_minio.py
                 grep -q "MINIO_BUCKET" dags/ingest_patients_from_minio.py
                 grep -q "patient" postgres-init/01_init_hospital.sql
 
@@ -35,9 +37,10 @@ pipeline {
         stage('Trigger Airflow DAG') {
             steps {
                 sh '''
+                set -eu
                 echo "Déclenchement du DAG Airflow"
 
-                curl -X POST "http://demo_airflow:8080/api/v1/dags/ingest_patients_from_minio/dagRuns" \
+                curl --fail -X POST "http://airflow:8080/api/v1/dags/ingest_patients_from_minio/dagRuns" \
                   -H "Content-Type: application/json" \
                   --user "admin:admin" \
                   -d "{\\"dag_run_id\\": \\"jenkins_run_${BUILD_NUMBER}\\"}"
@@ -50,6 +53,7 @@ pipeline {
         stage('Wait') {
             steps {
                 sh '''
+                set -eu
                 echo "Attente de l'exécution Airflow"
                 sleep 20
                 '''
@@ -59,10 +63,11 @@ pipeline {
         stage('Check PostgreSQL data') {
             steps {
                 sh '''
+                set -eu
                 echo "Contrôle des données insérées"
 
-                docker exec demo_postgres_hospital psql -U hospital_user -d hospital_db -c "SELECT COUNT(*) FROM patient;"
-                docker exec demo_postgres_hospital psql -U hospital_user -d hospital_db -c "SELECT COUNT(*) FROM service;"
+                docker exec demo_postgres_hospital_2 psql -U hospital_user -d hospital_db -c "SELECT COUNT(*) FROM patient;"
+                docker exec demo_postgres_hospital_2 psql -U hospital_user -d hospital_db -c "SELECT COUNT(*) FROM service;"
 
                 echo "Contrôle terminé"
                 '''
