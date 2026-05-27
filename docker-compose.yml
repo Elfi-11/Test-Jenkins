@@ -67,6 +67,7 @@ services:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
       AIRFLOW__CORE__EXECUTOR: "SequentialExecutor"
+      AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "sqlite:////opt/airflow/airflow.db"
       _PIP_ADDITIONAL_REQUIREMENTS: "pandas boto3 psycopg2-binary unidecode"
       HOSPITAL_PG_HOST: postgres-hospital

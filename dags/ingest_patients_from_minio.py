@@ -128,8 +128,8 @@ def s3_client():
 def ingest_patients_from_minio():
 
     @task
-    def hello_world() -> str:
-        message = "Hello world depuis Airflow, déclenché par Jenkins."
+    def hello_world2() -> str:
+        message = "Hello world depuis Airflow, déclenché par Jenkins-2."
         print(message)
         return message
 
@@ -198,7 +198,7 @@ def ingest_patients_from_minio():
 
         return {"file": key, "inserted": inserted, "rejected": rejected}
 
-    hello = hello_world()
+    hello = hello_world2()
     keys = list_csv_files()
     hello >> keys
     ingest_one_file.expand(key=keys)
