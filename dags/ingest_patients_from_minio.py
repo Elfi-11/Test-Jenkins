@@ -173,7 +173,9 @@ def ingest_patients_from_minio():
             clean_rows.append((nom, prenom, age, pathologie, service, key))
 
         inserted = 0
+        print("Hello World!")
 
+        try:
         with pg_conn() as conn:
             with conn.cursor() as cur:
                 for nom, prenom, age, pathologie, service, source_file in clean_rows:

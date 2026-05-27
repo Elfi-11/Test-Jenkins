@@ -100,6 +100,7 @@ services:
       - "8081:8080"
       - "50000:50000"
     environment:
+      JAVA_OPTS: -Djenkins.install.runSetupWizard=false
       HOSPITAL_PG_HOST: postgres-hospital
       HOSPITAL_PG_PORT: "5432"
       HOSPITAL_PG_DB: hospital_db
@@ -112,6 +113,7 @@ services:
       AIRFLOW_ENDPOINT: http://airflow:8080
     volumes:
       - jenkins_home_2:/var/jenkins_home
+      - ./jenkins/init.groovy.d:/var/jenkins_home/init.groovy.d
 
 volumes:
   postgres_hospital_data_2:
